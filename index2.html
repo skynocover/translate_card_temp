@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CodePen - Google Translate Clone Template with TailwindCss and alpine.js</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.materialdesignicons.com/6.5.95/css/materialdesignicons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.11.2/toastify.min.css"
+    />
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
+      integrity="sha512-xIPqqrfvUAc/Cspuj7Bq0UtHNo/5qkdyngx6Vwt+tmbvTLDszzXM0G6c91LXmGrRx8KEPulT+AfOOez+TeVylg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./script.js"></script>
+  </head>
+  <body>
+    <!-- partial:index.partial.html -->
+    <!-- Page Container -->
+    <div
+      class="relative bg-white"
+      x-cloak
+      x-data="getData()"
+      x-init="translatedText = await translation(sourceText); appInit();"
+    >
+      <!-- Header Container -->
+      <div class="flex">
+        <header class="flex flex-grow px-5 py-2 border-b border-gray-200">
+          <!-- Menu and Logo -->
+          <div class="flex-none">
+            <div class="flex flex-grow mt-1">
+              <button
+                class="hover:bg-gray-100 rounded-full w-9 h-9 mr-2 transition-colors duration-100"
+              >
+                <i class="mdi mdi-menu text-gray-500"></i>
+              </button>
+
+              <a href="https://translate.google.com.tr">
+                <img
+                  src="https://www.gstatic.com/images/branding/googlelogo/svg/googlelogo_clr_74x24px.svg"
+                  alt="Logo"
+                  class="mt-2"
+                />
+              </a>
+
+              <div class="ml-2 my-auto text-lg font-medium text-gray-500">Translate</div>
+            </div>
+          </div>
+
+          <!-- Middle Space -->
+          <div class="flex-grow"></div>
+
+          <!-- Apps and Avatar -->
+          <div class="flex-none">
+            <!-- Buttons -->
+            <div class="flex">
+              <button class="m-1" onClick="javascript:location.href='/index.html'">
+                <img
+                  src="https://avatars0.githubusercontent.com/u/17010054?v=4"
+                  alt="Avatar"
+                  class="object-cover w-9 h-9 rounded-full border shado"
+                />
+              </button>
+            </div>
+
+            <!-- Apps Container -->
+            <div
+              class="apps-container flex flex-wrap absolute bg-white shadow-md right-5 top-18 px-4 py-2 rounded-md border h-96 overflow-x-hidden overflow-y-scroll custom-scrollbar"
+              x-show="appsIsOpen"
+              x-on:mouseleave="setTimeout(() => { appsIsOpen = appsPopupIsActive ? false : true }, 1000)"
+              x-on:mouseenter="appsPopupIsActive = true"
+            >
+              <template x-for="(app, index) in apps">
+                <!-- App -->
+                <div
+                  class="container h-20 w-20 mx-1 my-2 hover:bg-blue-100 hover:cursor-pointer rounded-md transition-all duration-50"
+                  :title="app.name"
+                >
+                  <!-- Icon -->
+                  <img :src="app.icon" :alt="app.name" class="h-10 mx-auto mt-4" />
+
+                  <!-- Name -->
+                  <div
+                    class="text-sm text-center text-gray-700 select-none"
+                    x-text="app.name"
+                  ></div>
+                </div>
+              </template>
+
+              <button
+                class="border border-blue-200 text-center text-blue-600 hover:bg-blue-50/50 hover:text-blue-700 mx-auto px-3 py-1 mb-4 mt-10 rounded transition-all duration-50"
+              >
+                More from Google
+              </button>
+            </div>
+          </div>
+        </header>
+      </div>
+
+      <!-- component -->
+      <div
+        class="h-screen w-full overflow-hidden flex flex-nowrap text-center"
+        id="slider"
+        x-data="getTranslations()"
+        x-init="getRecord()"
+      >
+        <template x-for="char in chars">
+          <div
+            class="bg-blue-600 text-white space-y-4 flex-none w-full flex flex-col items-center justify-center"
+          >
+            <h2 class="text-4xl max-w-md" x-text="char.Nonuc"></h2>
+            <p class="max-w-md" x-text="char.Translate"></p>
+            <button
+              class="px-4 py-2 bg-indigo-500 outline-none rounded text-white shadow-indigo-200 shadow-lg font-medium active:shadow-none active:scale-95 hover:bg-indigo-600 focus:bg-indigo-600 focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 disabled:bg-gray-400/80 disabled:shadow-none disabled:cursor-not-allowed transition-colors duration-200"
+              @click="moveSlide()"
+            >
+              Primary
+            </button>
+          </div>
+        </template>
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          return;
+          const slider = document.querySelector('#slider');
+          setTimeout(function moveSlide() {
+            const max = slider.scrollWidth - slider.clientWidth;
+            const left = slider.clientWidth;
+
+            if (max === slider.scrollLeft) {
+              slider.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+              slider.scrollBy({ left, behavior: 'smooth' });
+            }
+
+            setTimeout(moveSlide, 2000);
+          }, 2000);
+        });
+      </script>
+    </div>
+    <!-- partial -->
+    <script src="https://cdn-tailwindcss.vercel.app/"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.11.2/toastify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/translate@1/translate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.8.1/cdn.min.js"></script>
+  </body>
+</html>
