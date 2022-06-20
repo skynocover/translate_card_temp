@@ -141,6 +141,9 @@ function getData() {
       const temp = window.getSelection().toString();
       if (temp) {
         this.selectText = temp;
+        const msg = new SpeechSynthesisUtterance();
+        msg.text = temp;
+        window.speechSynthesis.speak(msg);
         this.translatedText = await translation(temp);
       }
     },
