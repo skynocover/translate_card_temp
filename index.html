@@ -2,9 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>
-      CodePen - Google Translate Clone Template with TailwindCss and alpine.js
-    </title>
+    <title>Google Translate</title>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <link
       rel="stylesheet"
@@ -18,7 +16,6 @@
     <!-- https://www.npmjs.com/package/tesseract.js -->
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
 
-
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script
@@ -27,18 +24,16 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     ></script>
+
+    <!-- <script type="module" src="https://unpkg.com/googleapis@95.0.0/build/src/index.js"></script> -->
+
     <link rel="stylesheet" href="./style.css" />
     <script src="./script.js"></script>
   </head>
   <body>
     <!-- partial:index.partial.html -->
     <!-- Page Container -->
-    <div
-      class="relative bg-white"
-      x-cloak
-      x-data="getData()"
-      x-init="translatedText = await translation(sourceText); appInit();"
-    >
+    <div class="relative bg-white" x-cloak x-data="getData()" x-init="appInit();">
       <!-- Header Container -->
       <div class="flex">
         <header class="flex flex-grow px-5 py-2 border-b border-gray-200">
@@ -46,6 +41,7 @@
           <div class="flex-none">
             <div class="flex flex-grow mt-1">
               <button
+                title="A"
                 class="hover:bg-gray-100 rounded-full w-9 h-9 mr-2 transition-colors duration-100"
               >
                 <i class="mdi mdi-menu text-gray-500"></i>
@@ -59,9 +55,7 @@
                 />
               </a>
 
-              <div class="ml-2 my-auto text-lg font-medium text-gray-500">
-                Translate
-              </div>
+              <div class="ml-2 my-auto text-lg font-medium text-gray-500">Translate</div>
             </div>
           </div>
 
@@ -73,49 +67,24 @@
             <!-- Buttons -->
             <div class="flex">
               <button
-                class="m-1"
-                onClick="javascript:location.href='/index3.html'"
+                class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 mx-auto transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm"
+                onclick="modalHandler(true)"
               >
+                設定Airtable
+              </button>
+
+              <button
+                class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 mx-auto transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm"
+                @click="gotoCard()"
+              >
+                單字卡
+              </button>
+              <button class="m-2" onClick="javascript:location.href='/index2.html'">
                 <img
                   src="https://avatars0.githubusercontent.com/u/17010054?v=4"
                   alt="Avatar"
                   class="object-cover w-9 h-9 rounded-full border shado"
                 />
-              </button>
-            </div>
-
-            <!-- Apps Container -->
-            <div
-              class="apps-container flex flex-wrap absolute bg-white shadow-md right-5 top-18 px-4 py-2 rounded-md border h-96 overflow-x-hidden overflow-y-scroll custom-scrollbar"
-              x-show="appsIsOpen"
-              x-on:mouseleave="setTimeout(() => { appsIsOpen = appsPopupIsActive ? false : true }, 1000)"
-              x-on:mouseenter="appsPopupIsActive = true"
-            >
-              <template x-for="(app, index) in apps">
-                <!-- App -->
-                <div
-                  class="container h-20 w-20 mx-1 my-2 hover:bg-blue-100 hover:cursor-pointer rounded-md transition-all duration-50"
-                  :title="app.name"
-                >
-                  <!-- Icon -->
-                  <img
-                    :src="app.icon"
-                    :alt="app.name"
-                    class="h-10 mx-auto mt-4"
-                  />
-
-                  <!-- Name -->
-                  <div
-                    class="text-sm text-center text-gray-700 select-none"
-                    x-text="app.name"
-                  ></div>
-                </div>
-              </template>
-
-              <button
-                class="border border-blue-200 text-center text-blue-600 hover:bg-blue-50/50 hover:text-blue-700 mx-auto px-3 py-1 mb-4 mt-10 rounded transition-all duration-50"
-              >
-                More from Google
               </button>
             </div>
           </div>
@@ -131,16 +100,6 @@
           <div class="flex">
             <div class="py-4 z-10">
               <button
-                class="rounded px-3 py-1 bg-blue-100 border border-blue-200 text-base text-blue-700 font-semibold focus:outline-none focus:ring-1 focus:ring-blue-600"
-              >
-                Airtable Apikey
-              </button>
-              <input
-                class="border rounded px-3 py-1 mt-2"
-                type="password"
-                x-model="airtableKey"
-              />
-              <button
                 @click="store()"
                 class="rounded px-3 py-1 bg-blue-100 border border-blue-200 text-base text-blue-700 font-semibold focus:outline-none focus:ring-1 focus:ring-blue-600"
               >
@@ -153,41 +112,19 @@
           <div class="flex flex-row">
             <div class="pb-4 top-32 h z-10 w-full">
               <!-- Translator Container -->
-              <div
-                class="bg-white rounded-lg border border-gray-200 drop-shadow-sm shadow-sm"
-              >
+              <div class="bg-white rounded-lg border border-gray-200 drop-shadow-sm shadow-sm">
                 <!-- Language Bar -->
                 <div class="flex border-b border-gray-300">
                   <!-- From Languages -->
                   <div class="w-7/12">
                     <nav class="flex flex-row rounded-tl-lg">
-                      <!-- Detect Language -->
-                      <button
-                        class="uppercase py-3.5 px-3 text-gray-600 font-semibold text-xs lg:text-sm rounded-tl-lg hover:bg-gray-50 hover:text-gray-700 transition-colors duration-100"
-                      >
-                        Detect Language
-                      </button>
-
-                      <!-- Lang: Turkish -->
-                      <button
-                        class="uppercase py-3.5 px-3 text-gray-600 font-semibold text-xs lg:text-sm hover:bg-gray-50 hover:text-gray-700 transition-colors duration-100"
-                      >
-                        Turkish
-                      </button>
-
-                      <!-- Lang: English -->
-                      <button
-                        class="uppercase py-3.5 px-3 text-gray-600 font-semibold text-xs lg:text-sm hover:bg-gray-50 hover:text-gray-700 transition-colors duration-100 text-blue-500 hover:text-blue-600 border-b-2 border-blue-500"
-                      >
-                        English
-                      </button>
-
-                      <!-- Lang: Turkish -->
-                      <button
-                        class="uppercase py-3.5 px-3 text-gray-600 font-semibold text-xs lg:text-sm hover:bg-gray-50 hover:text-gray-700 transition-colors duration-100"
-                      >
-                        Japanese
-                      </button>
+                      <template x-for="setting in airtableSettings" :key="setting.key">
+                        <button
+                          :class="localStorage.getItem('selectedLanguage')==setting.key? 'uppercase py-3.5 px-3 text-gray-600 font-semibold text-xs lg:text-sm hover:bg-gray-50 hover:text-gray-700 transition-colors duration-100 text-blue-500 hover:text-blue-600 border-b-2 border-blue-500':'uppercase py-3.5 px-3 text-gray-600 font-semibold text-xs lg:text-sm rounded-tl-lg hover:bg-gray-50 hover:text-gray-700 transition-colors duration-100'"
+                          x-text="setting.key"
+                          @click="selectLanguage(setting.key)"
+                        ></button>
+                      </template>
 
                       <!-- More Languages -->
                       <button
@@ -204,9 +141,7 @@
                       <button
                         class="hover:bg-gray-100 rounded-full w-10 h-10 mt-1 transition-colors duration-100"
                       >
-                        <i
-                          class="mdi mdi-swap-horizontal mdi-24px text-gray-600"
-                        ></i>
+                        <i class="mdi mdi-swap-horizontal mdi-24px text-gray-600"></i>
                       </button>
                     </div>
                   </div>
@@ -267,9 +202,7 @@
                           x-show="sourceText.length"
                           x-on:click="sourceText = ''; translatedText = 'Translation';"
                         >
-                          <i
-                            class="mdi mdi-window-close mdi-24px text-red-400"
-                          ></i>
+                          <i class="mdi mdi-window-close mdi-24px text-red-400"></i>
                         </button>
                       </div>
                     </div>
@@ -280,19 +213,9 @@
                         <div class="flex-none">
                           <button
                             class="hover:bg-gray-200 rounded-full w-10 h-10 transition-colors duration-100"
-                          >
-                            <i
-                              class="mdi mdi-microphone mdi-24px text-gray-400"
-                            ></i>
-                          </button>
-
-                          <button
-                            class="hover:bg-gray-200 rounded-full w-10 h-10 transition-colors duration-100"
                             x-show="sourceText.length"
                           >
-                            <i
-                              class="mdi mdi-volume-high mdi-24px text-gray-600"
-                            ></i>
+                            <i class="mdi mdi-volume-high mdi-24px text-gray-600"></i>
                           </button>
                         </div>
 
@@ -304,14 +227,6 @@
                             >
                               0/5000
                             </div>
-
-                            <button
-                              class="hover:bg-gray-200 rounded-full w-10 h-10 mt-2 ml-2 transition-colors duration-100"
-                            >
-                              <i
-                                class="mdi mdi-keyboard-outline mdi-18px text-gray-600"
-                              ></i>
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -336,9 +251,7 @@
                           <button
                             class="hover:bg-gray-200 rounded-full w-10 h-10 mt-1 transition-colors duration-100"
                           >
-                            <i
-                              class="mdi mdi-volume-high mdi-24px text-gray-600"
-                            ></i>
+                            <i class="mdi mdi-volume-high mdi-24px text-gray-600"></i>
                           </button>
                         </div>
 
@@ -350,25 +263,7 @@
                               :data-clipboard-text="translatedText"
                               x-on:click="Toastify({text: 'Translation copied to your clipboard.', className: 'success rounded-md'}).showToast()"
                             >
-                              <i
-                                class="mdi mdi-content-copy mdi-18px text-gray-600"
-                              ></i>
-                            </button>
-
-                            <button
-                              class="hover:bg-gray-200 rounded-full w-10 h-10 mt-1 transition-colors duration-100"
-                            >
-                              <i
-                                class="mdi mdi-thumbs-up-down-outline mdi-18px text-gray-600"
-                              ></i>
-                            </button>
-
-                            <button
-                              class="hover:bg-gray-200 rounded-full w-10 h-10 mt-1 transition-colors duration-100"
-                            >
-                              <i
-                                class="mdi mdi-share-variant mdi-18px text-gray-600"
-                              ></i>
+                              <i class="mdi mdi-content-copy mdi-18px text-gray-600"></i>
                             </button>
                           </div>
                         </div>
@@ -382,21 +277,155 @@
         </div>
       </div>
 
-      <label for="dropzone-file" class="mx-auto cursor-pointer flex w-full max-w-lg flex-col items-center rounded-xl border-2 border-dashed border-blue-400 bg-white p-6 text-center">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      <label
+        for="dropzone-file"
+        class="mx-auto cursor-pointer flex w-full max-w-lg flex-col items-center rounded-xl border-2 border-dashed border-blue-400 bg-white p-6 text-center"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-10 w-10 text-blue-500"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+          />
         </svg>
-    
+
         <h2 class="mt-4 text-xl font-medium text-gray-700 tracking-wide">Payment File</h2>
-    
+
         <p class="mt-2 text-gray-500 tracking-wide">Upload or darg & drop your file</p>
-    
-        <input id="dropzone-file" type="file" class="hidden" @change="upload(Object.values($event.target.files))"/>
-      </section>
+
+        <input
+          id="dropzone-file"
+          type="file"
+          class="hidden"
+          @change="upload(Object.values($event.target.files))"
+        />
+      </label>
+
+      <!-- component -->
+      <!-- Code block starts -->
+      <!--- more free and premium Tailwind CSS components at https://tailwinduikit.com/ --->
+      <div
+        class="py-12 bg-gray-700 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0"
+        id="modal"
+      >
+        <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-lg">
+          <div
+            class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400"
+          >
+            <div class="w-full flex justify-start text-gray-600 mb-3"></div>
+            <h1 class="text-gray-800 font-lg font-bold tracking-normal leading-tight mb-4">
+              Airtable Setting
+            </h1>
+            <label for="name" class="text-gray-800 text-sm font-bold leading-tight tracking-normal"
+              >Airtable Apikey</label
+            >
+
+            <input
+              id="name"
+              class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+              type="password"
+              placeholder="key7C4cyg8Gg9aCF3"
+              x-model="airtableKey"
+            />
+
+            <div class="flex relative mb-5 mt-2">
+              <button
+                class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm"
+              >
+                <a href="https://airtable.com/shr6VPd5xNvoweq5l" target="_blank"
+                  >Use Airtable template</a
+                >
+              </button>
+            </div>
+
+            <label
+              for="expiry"
+              class="text-gray-800 text-sm font-bold leading-tight tracking-normal"
+              >Airtable URL of Language</label
+            >
+
+            <div class="flex relative mb-5 mt-2">
+              <input
+                class="text-gray-600 w-1/4 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                placeholder="language"
+                x-model="airtableSettings[0].key"
+              />
+              <input
+                class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                placeholder="Airtable url"
+                x-model="airtableSettings[0].url"
+              />
+            </div>
+
+            <label
+              for="expiry"
+              class="text-gray-800 text-sm font-bold leading-tight tracking-normal"
+              >Airtable URL of Language -2
+            </label>
+            <div class="flex relative mb-5 mt-2">
+              <input
+                class="text-gray-600 w-1/4 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                placeholder="language"
+                x-model="airtableSettings[1].key"
+              />
+              <input
+                class="text-gray-600 focus:outline-none focus:border focus:border-indigo-700 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border"
+                placeholder="Airtable url"
+                x-model="airtableSettings[1].url"
+              />
+            </div>
+
+            <div class="flex items-center justify-start w-full">
+              <button
+                class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 transition duration-150 ease-in-out hover:bg-indigo-600 bg-indigo-700 rounded text-white px-8 py-2 text-sm"
+                @click="storeAirtable()"
+              >
+                Submit
+              </button>
+              <button
+                class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm"
+                onclick="modalHandler()"
+              >
+                Cancel
+              </button>
+            </div>
+            <button
+              class="cursor-pointer absolute top-0 right-0 mt-4 mr-5 text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out rounded focus:ring-2 focus:outline-none focus:ring-gray-600"
+              onclick="modalHandler()"
+              aria-label="close modal"
+              role="button"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="icon icon-tabler icon-tabler-x"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                stroke-width="2.5"
+                stroke="currentColor"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" />
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Code block ends -->
 
       <!-- Bottom Buttons -->
-      <div class="flex flex-wrap items-center justify-center space-x-4 mt-20">
-        <!-- History -->
+      <!-- <div class="flex flex-wrap items-center justify-center space-x-4 mt-20">
         <div class="flex flex-col">
           <button
             class="hover:bg-gray-50 rounded-full w-20 h-20 mr-2 border border-gray-200 transition-colors duration-100"
@@ -411,7 +440,6 @@
           </div>
         </div>
 
-        <!-- Saved Translations -->
         <div class="flex flex-col">
           <button
             class="hover:bg-gray-50 rounded-full w-20 h-20 mr-2 border border-gray-200 transition-colors duration-100"
@@ -426,7 +454,6 @@
           </div>
         </div>
 
-        <!-- Contribute -->
         <div class="flex flex-col">
           <button
             class="hover:bg-gray-50 rounded-full w-20 h-20 mr-2 border border-gray-200 transition-colors duration-100"
@@ -442,7 +469,7 @@
             Contribute
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <!-- partial -->
     <script src="https://cdn-tailwindcss.vercel.app/"></script>
