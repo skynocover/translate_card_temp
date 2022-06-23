@@ -1,3 +1,5 @@
+const converter = OpenCC.Converter({ from: 'cn', to: 'tw' });
+
 async function translation(sourceText) {
   if (sourceText && sourceText.length > 0 && sourceText.length < 5001) {
     return await translate(sourceText, {
@@ -159,7 +161,7 @@ function getData() {
       modalHandler(false);
       new ClipboardJS('#copy-translation');
 
-      this.translatedText = await translation(this.sourceText);
+      this.translatedText = converter(await translation(this.sourceText));
 
       if (localStorage.getItem('airtableKey')) {
         this.airtableKey = localStorage.getItem('airtableKey');
@@ -181,7 +183,7 @@ function getData() {
         msg.text = temp;
         msg.lang = localStorage.getItem('selectedLanguage');
         window.speechSynthesis.speak(msg);
-        this.translatedText = await translation(temp);
+        this.translatedText = converter(await translation(temp));
       }
     },
     async upload(files) {
@@ -237,6 +239,7 @@ function getData() {
         },
       );
 
+      swal('已儲存!!');
       console.log(data);
     },
     selectLanguage(input) {
